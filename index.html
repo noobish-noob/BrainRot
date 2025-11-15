@@ -57,9 +57,9 @@
                     class="tab-button w-1/3 py-3 text-sm font-semibold text-gray-600 rounded-lg transition-all duration-300 hover:bg-indigo-50 hover:text-indigo-600 mx-1">
                 🇺🇸 US
             </button>
-            <button id="tab-ca" data-country="ca"
+            <button id="tab-world" data-country="world"
                     class="tab-button w-1/3 py-3 text-sm font-semibold text-gray-600 rounded-lg transition-all duration-300 hover:bg-indigo-50 hover:text-indigo-600 mx-1">
-                🌍 CA
+                🌍 World
             </button>
         </nav>
 
@@ -144,6 +144,8 @@
 
             if (countryCode !== 'world') {
                 url += `&country=${countryCode}`;
+            } else {
+                url += `&category=world`;
             }
 
             headlineList.innerHTML = `
