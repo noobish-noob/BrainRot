@@ -3,10 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My First News Site</title>
-    <!-- Load Tailwind CSS via CDN -->
+    <title>Brain Rot Central</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Configure Tailwind to use Inter font and apply rounded corners globally -->
     <script>
         tailwind.config = {
             theme: {
@@ -18,7 +16,6 @@
             }
         }
     </script>
-    <!-- Inter Font -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         /* Custom scrollbar for desktop/tablet view */
@@ -32,251 +29,140 @@
         }
 
         .headline-list::-webkit-scrollbar-track {
-            background: #f1f5f9; /* slate-100 */
+            background: #f1f5e9; /* slate-100 */
+        }
+        /* Style for trivia answer buttons */
+        .answer-button {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .correct-answer {
+            background-color: #10b981; /* emerald-500 */
+            color: white;
+            pointer-events: none; /* Disable clicking after selection */
+        }
+        .incorrect-answer {
+            background-color: #ef4444; /* red-500 */
+            color: white;
+            pointer-events: none;
+        }
+        .selected-answer {
+            /* Style for the button the user clicked */
+            box-shadow: 0 0 0 3px #6366f1; /* indigo ring */
+        }
+        /* Ensure the meme image fits the container */
+        #meme-image {
+            max-height: 50vh; /* Set a maximum height relative to the viewport */
+            width: auto;
+            max-width: 100%;
+            object-fit: contain;
         }
     </style>
 </head>
 <body class="bg-gray-50 min-h-screen p-4 sm:p-8 font-sans">
 
-    <!-- Main Container -->
     <div class="max-w-4xl mx-auto">
 
-        <!-- Header -->
         <header class="mb-8 p-4 bg-white shadow-xl rounded-xl">
-            <h1 class="text-3xl font-bold text-gray-800 text-center">First News</h1>
-            <p class="text-center text-sm text-gray-500 mt-1">Trending Headlines from around the world</p>
+            <h1 class="text-3xl font-bold text-gray-800 text-center">Brain Rot</h1>
+            <p class="text-center text-sm text-gray-500 mt-1">---------------------------------</p>
         </header>
 
-        <!-- Tab Navigation (Updated GB to World) -->
         <nav class="flex justify-center mb-6 bg-white p-2 rounded-xl shadow-lg">
-            <button id="tab-in" data-country="in"
+            <button id="tab-news" data-content="news" data-country="news"
                     class="tab-button w-1/3 py-3 text-sm font-semibold text-white rounded-lg transition-all duration-300 shadow-md bg-indigo-600 hover:bg-indigo-700 mx-1">
-                🇮🇳 India
+                📰 News
             </button>
-            <button id="tab-us" data-country="us"
+            <button id="tab-memes" data-content="memes" data-country="memes"
                     class="tab-button w-1/3 py-3 text-sm font-semibold text-gray-600 rounded-lg transition-all duration-300 hover:bg-indigo-50 hover:text-indigo-600 mx-1">
-                🇺🇸 US
+                😂 Memes
             </button>
-            <button id="tab-world" data-country="world"
+            <button id="tab-trivia" data-content="trivia" data-country="trivia"
                     class="tab-button w-1/3 py-3 text-sm font-semibold text-gray-600 rounded-lg transition-all duration-300 hover:bg-indigo-50 hover:text-indigo-600 mx-1">
-                🌍 World
+                🧠 Trivia
             </button>
         </nav>
 
-        <!-- News Content aArea -->
-        <div id="news-container" class="bg-white p-4 sm:p-6 rounded-xl shadow-2xl">
-            <div id="headline-list" class="headline-list space-y-4 max-h-[70vh] overflow-y-auto">
-                <!-- Headlines will be inserted here by JavaScript -->
-                <p class="text-center text-gray-500 py-10">Loading trending headlines...</p>
+        <div id="content-area" class="bg-white p-4 sm:p-6 rounded-xl shadow-2xl">
+            
+            <div id="news-view" class="active-view">
+                
+                <div class="mb-4 flex flex-col sm:flex-row sm:items-center justify-between p-3 bg-gray-100 rounded-lg">
+                    <label for="country-select" class="text-sm font-medium text-gray-700 mb-2 sm:mb-0">Select News Region:</label>
+                    <select id="country-select" class="form-select block w-full sm:w-1/2 rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 py-2 px-3">
+                        </select>
+                </div>
+
+                <div id="headline-list" class="headline-list space-y-4 max-h-[70vh] overflow-y-auto">
+                    <p class="text-center text-gray-500 py-10">Loading trending headlines...</p>
+                </div>
+                <div id="load-more-container" class="mt-4 text-center hidden">
+                    <button id="load-more-button"
+                            class="px-6 py-2 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 transition duration-150">
+                        Load More
+                    </button>
+                </div>
             </div>
 
-            <!-- Load More Container -->
-            <div id="load-more-container" class="mt-4 text-center hidden">
-                <button id="load-more-button"
-                        class="px-6 py-2 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 transition duration-150">
-                    Load More
-                </button>
+            <div id="memes-view" class="hidden text-center p-4">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6">😂 Random Meme, coz why not!</h2>
+                
+                <div class="mb-4 flex flex-col sm:flex-row sm:items-center justify-center p-3 bg-gray-100 rounded-lg">
+                    <label for="meme-filter-select" class="text-sm font-medium text-gray-700 mb-2 sm:mb-0 sm:mr-4"></label>
+                    <select id="meme-filter-select" class="form-select block w-full sm:w-1/3 rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 py-2 px-3">
+                        </select>
+                </div>
+                <div id="meme-content" class="min-h-[150px] flex flex-col justify-center items-center p-4 bg-gray-50 rounded-xl border border-gray-200">
+                    <p id="meme-title" class="text-xl font-semibold text-gray-700 mb-4 text-center w-full">Loading...</p>
+                    <img id="meme-image" src="" alt="Trending Meme" class="rounded-lg shadow-md mb-4 hidden" onerror="this.classList.add('hidden'); document.getElementById('meme-error').classList.remove('hidden');">
+                    <p id="meme-error" class="text-gray-500 hidden">loading image.....</p>
+                </div>
+                
+                <div class="mt-6 text-center">
+                    <button id="next-meme-button"
+                            class="px-8 py-3 bg-indigo-600 text-white font-bold rounded-lg shadow-lg hover:bg-indigo-700 transition duration-150">
+                         Next 
+                    </button>
+                </div>
+
+                <p class="text-xs text-gray-400 mt-4">Source: Reddit</p>
+            </div>
+
+
+            <div id="trivia-view" class="hidden">
+                <h2 class="text-2xl font-bold text-gray-800 mb-4 text-center">🧠 General Knowledge Quiz</h2>
+                <div id="trivia-info" class="mb-4 text-center text-sm text-gray-500">
+                    Click "Start Quiz" to begin!
+                </div>
+                <div id="trivia-question-card" class="hidden bg-gray-50 p-6 rounded-xl border border-gray-200">
+                    <p id="trivia-question" class="text-lg font-semibold text-gray-800 mb-4 leading-relaxed">
+                        </p>
+                    <div id="trivia-options" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        </div>
+                    <div class="mt-6 flex justify-between items-center">
+                        <button id="next-question-button"
+                                class="px-4 py-2 bg-indigo-500 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-600 transition duration-150 hidden"
+                                disabled>
+                            Next Question (5s)
+                        </button>
+                        <span id="current-score" class="text-lg font-bold text-indigo-600">Score: 0</span>
+                    </div>
+                </div>
+                <div id="trivia-controls" class="mt-6 text-center">
+                    <button id="start-quiz-button"
+                            class="px-8 py-3 bg-green-600 text-white font-bold rounded-lg shadow-lg hover:bg-green-700 transition duration-150">
+                        Start Quiz
+                    </button>
+                </div>
             </div>
 
         </div>
 
-        <!-- Footer / Data Source Information -->
         <footer class="mt-8 text-center text-xs text-gray-400">
-            <p>Data provided by a third-party news API.</p>
+            <p>News data by a third-party news API. Memes data by external API. Trivia data by Open Trivia Database (OpenTDB).</p>
         </footer>
     </div>
 
-    <script>
-        // --- HARDCODED API KEY ---
-        const apiKey = 'pub_7f7d8e3f4a7a4c23a323542f32f27e94'; 
-
-        // --- PAGINATION STATE & CONSTANTS ---
-        const HEADLINES_PER_PAGE = 5;
-        let appState = {
-            currentArticles: [], // Stores all fetched articles for the active tab
-            currentIndex: 0,     // Index of the next article to load
-            countryCode: 'in'
-        };
-        // ------------------------------------
-
-        // DOM elements
-        const headlineList = document.getElementById('headline-list');
-        const tabButtons = document.querySelectorAll('.tab-button');
-        const loadMoreContainer = document.getElementById('load-more-container');
-        const loadMoreButton = document.getElementById('load-more-button');
-
-        // Utility function to display messages instead of alerts
-        function displayMessage(message, type = 'info') {
-            const color = type === 'error' ? 'text-red-600' : 'text-yellow-600';
-            const bgColor = type === 'error' ? 'bg-red-50' : 'bg-yellow-50';
-
-            headlineList.innerHTML = `
-                <div class="text-center p-6 ${bgColor} rounded-xl">
-                    <p class="font-semibold ${color}">${message}</p>
-                </div>
-            `;
-            // Hide the load more button when an error or info message is displayed
-            loadMoreContainer.classList.add('hidden');
-        }
-
-        // --- NEWS API LOGIC ---
-
-        // Map for display names (Used in loading/error messages)
-        const countryMap = {
-            'in': 'India',
-            'us': 'US',
-            'ca': 'Canada'
-        };
-
-        // New function to update the visibility of the Load More button
-        function updateLoadMoreButton() {
-            const remainingCount = appState.currentArticles.length - appState.currentIndex;
-            if (remainingCount > 0) {
-                loadMoreButton.textContent = `Load More`;
-                loadMoreContainer.classList.remove('hidden');
-            } else {
-                loadMoreContainer.classList.add('hidden');
-            }
-        }
-
-        async function fetchNews(countryCode) {
-            let url = `https://newsdata.io/api/1/latest?apikey=${apiKey}&language=en&category=politics,sports,technology`;
-
-            if (countryCode !== 'world') {
-                url += `&country=${countryCode}`;
-            } else {
-                url += `&category=world`;
-            }
-
-            headlineList.innerHTML = `
-                <div class="flex justify-center items-center py-10">
-                    <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-indigo-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    <p class="text-indigo-500 font-medium">Loading trending headlines for ${countryMap[countryCode]}...</p>
-                </div>
-            `;
-            loadMoreContainer.classList.add('hidden'); // Hide button during load
-
-            try {
-                const response = await fetch(url);
-                const data = await response.json();
-
-                if (data.status === 'error') {
-                    let errorMessage = data.message || "An unknown Newsdata.io API error occurred.";
-                    displayMessage(`API Error for ${countryMap[countryCode]}: ${errorMessage}`, 'error');
-                    return;
-                }
-                
-                // --- Update State after successful fetch ---
-                appState.currentArticles = data.results || [];
-                appState.currentIndex = 0;
-                appState.countryCode = countryCode;
-                
-                renderHeadlines(true); // Start a new render (clears old list)
-
-            } catch (error) {
-                console.error("Fetch failed:", error);
-                displayMessage(`Network error while fetching news for ${countryMap[countryCode]}.`, 'error');
-            }
-        }
-
-        // Function to render news headlines (Updated for pagination)
-        function renderHeadlines(isNewLoad = false) {
-            const articles = appState.currentArticles;
-
-            if (isNewLoad) {
-                headlineList.innerHTML = ''; // Clear existing content only for a new tab load
-                
-                // Handle no results case immediately after fetch
-                if (!articles || articles.length === 0) {
-                    headlineList.innerHTML = `<p class="text-center text-gray-500 py-10">No trending news found for ${countryMap[appState.countryCode]} at this time.</p>`;
-                    updateLoadMoreButton();
-                    return;
-                }
-            }
-            
-            // Calculate slice window
-            const startIndex = appState.currentIndex;
-            const endIndex = Math.min(startIndex + HEADLINES_PER_PAGE, articles.length);
-
-            // Get the articles for this page
-            const articlesToRender = articles.slice(startIndex, endIndex);
-
-            // Render the articles (appending to the list)
-            articlesToRender.forEach(item => { 
-                const newsItem = document.createElement('a');
-                newsItem.href = item.link || '#';
-                newsItem.target = "_blank";
-                newsItem.className = 'block p-4 border border-gray-100 bg-white rounded-xl shadow-md transition-all duration-200 hover:shadow-lg hover:border-indigo-400 cursor-pointer';
-
-                const headlineText = document.createElement('p');
-                headlineText.className = 'text-base font-semibold text-gray-800 leading-relaxed mb-1';
-                headlineText.textContent = item.title;
-
-                const sourceText = document.createElement('p');
-                sourceText.className = 'text-xs text-indigo-500 font-medium italic';
-                sourceText.textContent = `Source: ${item.source_id || 'Unknown'}`;
-
-                newsItem.appendChild(headlineText);
-                newsItem.appendChild(sourceText);
-                headlineList.appendChild(newsItem);
-            });
-
-            // Update index for next page load
-            appState.currentIndex = endIndex;
-            
-            // Update button state
-            updateLoadMoreButton();
-        }
-
-        // New function for handling 'Load More' click
-        function loadMoreHeadlines() {
-            renderHeadlines(false);
-        }
-
-        // Add event listener for the new button
-        loadMoreButton.addEventListener('click', loadMoreHeadlines);
-
-        // Function to handle tab clicks
-        function switchRegion(event) {
-            const selectedButton = event.currentTarget;
-            const countryCode = selectedButton.getAttribute('data-country');
-
-            // 1. Update button styles
-            tabButtons.forEach(button => {
-                button.classList.remove('bg-indigo-600', 'text-white', 'shadow-md');
-                // Ensure only the selected button gets text-white for flag readability
-                button.classList.add('text-gray-600', 'hover:bg-indigo-50', 'hover:text-indigo-600');
-            });
-
-            selectedButton.classList.add('bg-indigo-600', 'text-white', 'shadow-md');
-            selectedButton.classList.remove('text-gray-600', 'hover:bg-indigo-50', 'hover:text-indigo-600');
-
-            // 2. Fetch and render content
-            fetchNews(countryCode);
-        }
-
-        // Add event listeners to all tab buttons
-        tabButtons.forEach(button => {
-            button.addEventListener('click', switchRegion);
-        });
-
-        // Initialize the app by setting the default tab state (India)
-        function initializeTabState() {
-            const indiaButton = document.getElementById('tab-in');
-            if (indiaButton) {
-                // Set the active style for the default tab
-                indiaButton.classList.add('bg-indigo-600', 'text-white', 'shadow-md');
-                indiaButton.classList.remove('text-gray-600', 'hover:bg-indigo-50', 'hover:text-indigo-600');
-            }
-            // Load news for the default tab
-            fetchNews('in');
-        }
-
-        // Start initialization on window load
-        window.onload = initializeTabState;
-    </script>
+    <script src="script.js"></script>
 </body>
 </html>
