@@ -201,6 +201,9 @@ async function fetchNews(countryCode) {
 function renderHeadlines(isNewLoad = false) {
     const articles = newsAppState.currentArticles;
     const countryDisplayName = newsAppState.countryName; 
+    
+    // 1. Get the current number of children BEFORE adding new articles (important for scrolling)
+    const currentListCount = headlineList.children.length;
 
     if (isNewLoad) {
         headlineList.innerHTML = ''; 
@@ -257,9 +260,8 @@ function renderHeadlines(isNewLoad = false) {
     });
 
     newsAppState.currentIndex = endIndex;
-    updateLoadMoreButton();
-}
-// 5. Autoscroll to the first newly added article (only if not a new initial load)
+
+    // 5. Autoscroll to the first newly added article (only if not a new initial load)
     if (!isNewLoad && articlesToRender.length > 0) {
         // The first newly loaded element is at the index of the list's previous length
         const firstNewItem = headlineList.children[currentListCount];
@@ -815,4 +817,3 @@ function initializeApp() {
 }
 
 window.onload = initializeApp;
-
