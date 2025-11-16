@@ -259,6 +259,20 @@ function renderHeadlines(isNewLoad = false) {
     newsAppState.currentIndex = endIndex;
     updateLoadMoreButton();
 }
+// 5. Autoscroll to the first newly added article (only if not a new initial load)
+    if (!isNewLoad && articlesToRender.length > 0) {
+        // The first newly loaded element is at the index of the list's previous length
+        const firstNewItem = headlineList.children[currentListCount];
+        if (firstNewItem) {
+            firstNewItem.scrollIntoView({ 
+                behavior: 'smooth', 
+                block: 'start' // Scroll to align the top of the element with the top of the list container
+            });
+        }
+    }
+
+    updateLoadMoreButton();
+}
 
 /**
  * Populates the country selection dropdown with options from the countryMap, sorted alphabetically.
@@ -801,3 +815,4 @@ function initializeApp() {
 }
 
 window.onload = initializeApp;
+
