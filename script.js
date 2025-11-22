@@ -27,15 +27,29 @@ const countryMap = {
 
 // ------------------------------------
 
-// --- TRIVIA STATE & CONSTANTS ---
 let triviaAppState = {
     questions: [],
     currentQuestionIndex: 0,
     score: 0,
     isQuizActive: false,
-    timer: null
+    timer: null,
+    // Default category is General Knowledge (ID 9)
+    selectedCategory: '9' 
 };
-const TRIVIA_API_URL = "https://opentdb.com/api.php?amount=10&type=multiple"; 
+
+// New mapping for OpenTDB Category IDs
+const TRIVIA_CATEGORIES = {
+    '9': '🧠 General Knowledge',
+    '21': '🏅 Sports',
+    '11': '🎬 Movies',
+    '24': '🏛️ Politics',
+    '23': '📜 History'
+};
+
+// Base URL for fetching trivia questions
+// The category and amount will be dynamically added in startQuiz()
+const TRIVIA_API_URL_BASE = "https://opentdb.com/api.php?amount=10&type=multiple"; 
+// ------------------------------------
 // ------------------------------------
 
 // --- MEME STATE & CONSTANTS ---
@@ -83,6 +97,9 @@ const triviaQuestionEl = document.getElementById('trivia-question');
 const triviaOptions = document.getElementById('trivia-options');
 const nextQuestionButton = document.getElementById('next-question-button');
 const currentScoreEl = document.getElementById('current-score');
+const triviaCategorySelect = document.getElementById('trivia-category-select'); // New element
+const triviaInfo = document.getElementById('trivia-info');
+
 
 // STOCKS ELEMENTS
 const stocksView = document.getElementById('stocks-view');
@@ -382,6 +399,41 @@ async function fetchRandomMeme() {
 
 
 // === TRIVIA LOGIC ===
+/**
+ * Populates the trivia category selection dropdown with options from TRIVIA_CATEGORIES.
+ */
+function populateTriviaCategorySelector() {
+    // 1. Convert the category map object into an array of [id, name] pairs
+    let sortedCategories = Object.entries(TRIVIA_CATEGORIES);
+    
+    // 2. Clear existing options
+    triviaCategorySelect.innerHTML = ''; 
+
+    // 3. Populate the dropdown with options
+    sortedCategories.forEach(([id, name]) => {
+        const option = document.createElement('option');
+        option.value = id;
+        option.textContent = name;
+        triviaCategorySelect.appendChild(option);
+    });
+    
+    // Set default selection
+    triviaCategorySelect.value = triviaAppState.selectedCategory;
+}
+
+/**
+ * Handles the change event from the category selection dropdown.
+ */
+function handleTriviaCategoryChange() {
+    triviaAppState.selectedCategory = triviaCategorySelect.value;
+    // Reset quiz info when category changes
+    if (!triviaAppState.isQuizActive) {
+        triviaInfo.textContent = "Click \"Start Quiz\" to begin!";
+        triviaQuestionCard.classList.add('hidden');
+        startQuizButton.classList.remove('hidden');
+    }
+}
+
 
 async function startQuiz() {
     triviaAppState.isQuizActive = true;
@@ -391,13 +443,22 @@ async function startQuiz() {
     triviaInfo.textContent = "Loading questions...";
     startQuizButton.classList.add('hidden');
     triviaQuestionCard.classList.add('hidden');
-
+    
+    // Construct the API URL with the selected category
+    const categoryId = triviaAppState.selectedCategory;
+    const fetchUrl = `${TRIVIA_API_URL_BASE}&category=${categoryId}`;
+    
     try {
-        const response = await fetch(TRIVIA_API_URL);
+        const response = await fetch(fetchUrl);
         const data = await response.json();
 
         if (data.response_code !== 0 || !data.results || data.results.length === 0) {
-            triviaInfo.innerHTML = "Failed to load trivia questions. Please try again later.";
+            // Check for specific OpenTDB error (e.g., no questions for that category/amount)
+            if (data.response_code === 1) {
+                triviaInfo.innerHTML = "No questions found for this category! Try a different one.";
+            } else {
+                triviaInfo.innerHTML = "Failed to load trivia questions. Please try again later.";
+            }
             startQuizButton.classList.remove('hidden');
             return;
         }
@@ -817,3 +878,4 @@ function initializeApp() {
 }
 
 window.onload = initializeApp;
+
