@@ -839,6 +839,8 @@ nextQuestionButton.addEventListener('click', () => {
     clearTimeout(triviaAppState.timer); 
     nextQuestion();
 });
+// NEW: Trivia Category Change
+triviaCategorySelect.addEventListener('change', handleTriviaCategoryChange);
 
 // 6. Stocks Controls (Search Button)
 stockSearchButton.addEventListener('click', handleStockSearch);
@@ -878,4 +880,5 @@ function initializeApp() {
 }
 
 window.onload = initializeApp;
+
 
